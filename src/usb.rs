@@ -85,7 +85,9 @@ pub fn pico_thread(mut child: Child, thread_tx: Sender<Paquete>) -> Result<(), s
                         registro: ((com >> 16) & 0x000000FF) as u8,
                         valor: (com & 0x0000FFFF) as u16,
                     };
-                    //println!("registro: {}", paq.registro);
+                    println!("\ncommando: {:x}", paq.comando);
+                    println!("registro: {:x}", paq.registro);
+                    println!("valor: {:x}", paq.valor);
                     thread_tx.send(paq).expect("Fallo en el canal (tx)");
                     line.clear();
                     // reload the poller

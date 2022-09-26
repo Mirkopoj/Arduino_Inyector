@@ -1,4 +1,4 @@
-/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/build/core/CDC.cpp.o: \
+/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/build/core/CDC.cpp.o: \
  /home/mirko/.arduino15/packages/arduino/hardware/avr/1.8.5/cores/arduino/CDC.cpp \
  /home/mirko/.arduino15/packages/arduino/hardware/avr/1.8.5/cores/arduino/USBAPI.h \
  /home/mirko/.arduino15/packages/arduino/hardware/avr/1.8.5/cores/arduino/Arduino.h \

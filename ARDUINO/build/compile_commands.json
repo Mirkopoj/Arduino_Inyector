@@ -1,6 +1,6 @@
 [
  {
-  "directory": "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector",
+  "directory": "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO",
   "arguments": [
    "/home/mirko/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",
@@ -24,14 +24,14 @@
    "-I/home/mirko/.arduino15/packages/arduino/hardware/avr/1.8.5/cores/arduino",
    "-I/home/mirko/.arduino15/packages/arduino/hardware/avr/1.8.5/variants/eightanaloginputs",
    "-I/home/mirko/.arduino15/packages/arduino/hardware/avr/1.8.5/libraries/SPI/src",
-   "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/build/sketch/arduino_inyector.ino.cpp",
+   "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/build/sketch/ARDUINO.ino.cpp",
    "-o",
-   "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/build/sketch/arduino_inyector.ino.cpp.o"
+   "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/build/sketch/ARDUINO.ino.cpp.o"
   ],
-  "file": "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/build/sketch/arduino_inyector.ino.cpp"
+  "file": "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/build/sketch/ARDUINO.ino.cpp"
  },
  {
-  "directory": "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector",
+  "directory": "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO",
   "arguments": [
    "/home/mirko/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",
@@ -57,7 +57,7 @@
    "-I/home/mirko/.arduino15/packages/arduino/hardware/avr/1.8.5/libraries/SPI/src",
    "/home/mirko/.arduino15/packages/arduino/hardware/avr/1.8.5/libraries/SPI/src/SPI.cpp",
    "-o",
-   "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/build/libraries/SPI/SPI.cpp.o"
+   "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/build/libraries/SPI/SPI.cpp.o"
   ],
   "file": "/home/mirko/.arduino15/packages/arduino/hardware/avr/1.8.5/libraries/SPI/src/SPI.cpp"
  }

@@ -60,7 +60,7 @@ fn main() -> io::Result<()> {
             thread::sleep(time::Duration::from_millis(2000));
             loop {
                 let paq = writer_rx.recv().expect("Falló el thread pico_writer");
-                let msg: u32 = match paq.comando {
+                let mut msg: u32 = match paq.comando {
                     0x25 => 0x25000000 | (paq.registro as u32) << 16 | paq.valor as u32,
                     0x3C => 0x3C000000 | (paq.registro as u32) << 16,
                     0x29 => 0x29000000 | (paq.registro as u32) << 16 | paq.valor as u32,
@@ -69,7 +69,9 @@ fn main() -> io::Result<()> {
                     }
                     _ => 0xFFFFFFFF,
                 };
+                msg |= (msg.count_ones()%2)<<31;
                 let out = format!("{:010}", msg);
+                println!("\nout: {}", out);
                 picoin.write_all(out.as_bytes()).expect("No salió");
                 thread::sleep(time::Duration::from_millis(100));
             }
