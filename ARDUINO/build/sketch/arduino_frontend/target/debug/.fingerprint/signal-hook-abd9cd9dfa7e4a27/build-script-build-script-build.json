@@ -1,0 +1,2 @@
+#line 1 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/target/debug/.fingerprint/signal-hook-abd9cd9dfa7e4a27/build-script-build-script-build.json"
+{"rustc":14171256686237270521,"features":"[\"channel\", \"default\", \"iterator\"]","target":13294766831966498538,"profile":12637318739757120569,"path":5397555006105384088,"deps":[],"local":[{"CheckDepInfo":{"dep_info":"debug/.fingerprint/signal-hook-abd9cd9dfa7e4a27/dep-build-script-build-script-build"}}],"rustflags":[],"metadata":2150675457153548094,"config":2202906307356721367,"compile_kind":0}
