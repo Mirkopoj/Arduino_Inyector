@@ -9,6 +9,7 @@ void setup() {
  pinMode(2, 0x1);
  pinMode(3, 0x1);
  digitalWrite(10, 0x1);
+ SPI.beginTransaction(SPISettings(1000000, 1, 0x0C));
  SPI.begin();
  Serial.begin(9600);
 }

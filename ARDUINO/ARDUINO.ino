@@ -15,6 +15,7 @@ void setup() {
 	pinMode(2, OUTPUT);
 	pinMode(3, OUTPUT);
 	digitalWrite(SS, HIGH);
+	SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE3));
 	SPI.begin();
 	Serial.begin(9600);
 }

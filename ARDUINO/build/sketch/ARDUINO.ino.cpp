@@ -14,11 +14,11 @@ uint16_t spi_write(uint16_t msgF);
 
 #line 13 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino"
 void setup();
-#line 22 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino"
+#line 23 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino"
 void loop();
-#line 93 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino"
+#line 94 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino"
 uint32_t command_parse(char str[10]);
-#line 102 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino"
+#line 103 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino"
 uint16_t spi_write(uint16_t msg);
 #line 13 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino"
 void setup() {
@@ -26,6 +26,7 @@ void setup() {
 	pinMode(2, OUTPUT);
 	pinMode(3, OUTPUT);
 	digitalWrite(SS, HIGH);
+	SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE3));
 	SPI.begin();
 	Serial.begin(9600);
 }
