@@ -1,6 +1,6 @@
 [
  {
-  "directory": "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO",
+  "directory": "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend",
   "arguments": [
    "/home/mirko/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",
@@ -31,7 +31,7 @@
   "file": "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/build/sketch/ARDUINO.ino.cpp"
  },
  {
-  "directory": "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO",
+  "directory": "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend",
   "arguments": [
    "/home/mirko/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",

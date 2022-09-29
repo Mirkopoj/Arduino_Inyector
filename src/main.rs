@@ -69,9 +69,13 @@ fn main() -> io::Result<()> {
                     }
                     _ => 0xFFFFFFFF,
                 };
-                msg |= (msg.count_ones()%2)<<31;
+                let msgh = msg & 0xFFFF0000;
+                let msgl = msg & 0x0000FFFF;
+                msg |= (msgh.count_ones()%2)<<31;
+                msg |= (msgl.count_ones()%2)<<15;
                 let out = format!("{:010}", msg);
                 println!("\nout: {}", out);
+                println!("\nmsg: {:08X}", msg);
                 picoin.write_all(out.as_bytes()).expect("No salió");
                 thread::sleep(time::Duration::from_millis(100));
             }

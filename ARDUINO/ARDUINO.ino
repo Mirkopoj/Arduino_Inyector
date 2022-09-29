@@ -14,8 +14,12 @@ void setup() {
 	pinMode(SS, OUTPUT);
 	pinMode(2, OUTPUT);
 	pinMode(3, OUTPUT);
+	pinMode(8, OUTPUT);
+	pinMode(9, OUTPUT);
 	digitalWrite(SS, HIGH);
-	SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE3));
+	digitalWrite(8, HIGH);
+	digitalWrite(9, HIGH);
+	SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE1));
 	SPI.begin();
 	Serial.begin(9600);
 }
