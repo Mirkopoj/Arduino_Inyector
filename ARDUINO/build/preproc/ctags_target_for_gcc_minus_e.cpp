@@ -13,7 +13,7 @@ void setup() {
  digitalWrite(10, 0x1);
  digitalWrite(8, 0x1);
  digitalWrite(9, 0x1);
- SPI.beginTransaction(SPISettings(1000000, 1, 0x04));
+ SPI.beginTransaction(SPISettings(1000000, 1, 0x00));
  SPI.begin();
  Serial.begin(9600);
 }
