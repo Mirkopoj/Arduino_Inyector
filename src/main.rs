@@ -31,6 +31,8 @@ enum CEvent<I> {
     Tick,
 }
 
+const PRINTS:bool = false;
+
 fn main() -> io::Result<()> {
     //Launch picocom
     let mut child = match Command::new("picocom")
@@ -74,8 +76,10 @@ fn main() -> io::Result<()> {
                 msg |= (msgh.count_ones()%2)<<31;
                 msg |= (msgl.count_ones()%2)<<15;
                 let out = format!("{:010}", msg);
-                println!("\nout: {}", out);
-                println!("\nmsg: {:08X}", msg);
+                if PRINTS {
+                    println!("\nout: {}", out);
+                    println!("\nmsg: {:08X}", msg);
+                }
                 picoin.write_all(out.as_bytes()).expect("No salió");
                 thread::sleep(time::Duration::from_millis(100));
             }
@@ -1003,8 +1007,8 @@ fn main() -> io::Result<()> {
                     }
                 }
             };
-            match paq.comando {
-                0x25 | 0x3C => { registros[paq.registro as usize] = paq.valor; }
+            match paq.comando & 0x7F {
+                0x25 | 0x3C => { registros[paq.registro as usize] = paq.valor & 0x7FFF; }
                 0x29 => {señal[paq.registro as usize] = paq.valor == 0xFFFF; }
                 _ => { }
             }

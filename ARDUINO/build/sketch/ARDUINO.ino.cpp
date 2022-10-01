@@ -30,7 +30,7 @@ void setup() {
 	digitalWrite(SS, HIGH);
 	digitalWrite(8, HIGH);
 	digitalWrite(9, HIGH);
-	SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0));
+	SPI.beginTransaction(SPISettings(100000, MSBFIRST, SPI_MODE1));
 	SPI.begin();
 	Serial.begin(9600);
 }

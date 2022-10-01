@@ -5,6 +5,7 @@ use std::io::{BufRead, BufReader};
 
 use std::sync::mpsc::Sender;
 
+use crate::PRINTS;
 use crate::struct_paquete::Paquete;
 
 pub fn pico_thread(mut child: Child, thread_tx: Sender<Paquete>) -> Result<(), std::io::Error> {
@@ -85,9 +86,11 @@ pub fn pico_thread(mut child: Child, thread_tx: Sender<Paquete>) -> Result<(), s
                         registro: ((com >> 16) & 0x000000FF) as u8,
                         valor: (com & 0x0000FFFF) as u16,
                     };
-                    println!("\ncommando: {:x}", paq.comando);
-                    println!("registro: {:x}", paq.registro);
-                    println!("valor: {:x}", paq.valor);
+                    if PRINTS {
+                        println!("\ncommando: {:x}", paq.comando);
+                        println!("registro: {:x}", paq.registro);
+                        println!("valor: {:x}", paq.valor);
+                    }
                     thread_tx.send(paq).expect("Fallo en el canal (tx)");
                     line.clear();
                     // reload the poller
