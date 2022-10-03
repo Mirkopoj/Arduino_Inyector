@@ -16,9 +16,9 @@ uint16_t spi_write(uint16_t msgF);
 void setup();
 #line 27 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino"
 void loop();
-#line 98 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino"
+#line 83 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino"
 uint32_t command_parse(char str[10]);
-#line 107 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino"
+#line 92 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino"
 uint16_t spi_write(uint16_t msg);
 #line 13 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino"
 void setup() {
@@ -30,7 +30,7 @@ void setup() {
 	digitalWrite(SS, HIGH);
 	digitalWrite(8, HIGH);
 	digitalWrite(9, HIGH);
-	SPI.beginTransaction(SPISettings(100000, MSBFIRST, SPI_MODE1));
+	SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE1));
 	SPI.begin();
 	Serial.begin(9600);
 }
@@ -53,35 +53,20 @@ void loop() {
 				uint8_t instruccion = commando>>24;
 				instruccion &= 0x7F;
 				if (instruccion == 0x25) {
-					digitalWrite(3,HIGH);
 					spi_write((commando>>16)&0x0000FFFF);
 					spi_write((commando)&0x0000FFFF);
 					ret = spi_write(0);
 				}
-				/*switch (instruccion) {
-					case 0x29:
-						digitalWrite(3,HIGH);
-						int pin = (commando>>16)&0xFF;
-						int pin_state = (commando&0x0000FFFF)==0x0000FFFF? HIGH:LOW;
-						digitalWrite(pin, pin_state);
-						ret = digitalRead(pin)==HIGH? 0xFFFF : 0x0000;
-						break;
-					case 0x3C:
-						digitalWrite(3,HIGH);
-						spi_write((commando>>16)&0x0000FFFF);
-						ret = spi_write(0);
-						break;
-					case 0x25:
-						digitalWrite(3,HIGH);
-						spi_write((commando>>16)&0x0000FFFF);
-						spi_write((commando)&0x0000FFFF);
-						ret = spi_write(0);
-						break;
-					default:
-						digitalWrite(3,HIGH);
-						break;
-				}*/
-				digitalWrite(2,HIGH);
+				if (instruccion == 0x3C) {
+					spi_write((commando>>16)&0x0000FFFF);
+					ret = spi_write(0);
+				}
+				if (instruccion == 0x29) {
+					int pin = (commando>>16)&0xFF;
+					int pin_state = (commando&0x0000FFFF)==0x0000FFFF? HIGH:LOW;
+					digitalWrite(pin, pin_state);
+					ret = digitalRead(pin)==HIGH? 0xFFFF : 0x0000;
+				}
 				commando &= 0xFFFF0000;
 				Serial.println(commando|ret);
 			}

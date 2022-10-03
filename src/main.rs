@@ -66,6 +66,7 @@ fn main() -> io::Result<()> {
                     0x25 => 0x25000000 | (paq.registro as u32) << 16 | paq.valor as u32,
                     0x3C => 0x3C000000 | (paq.registro as u32) << 16,
                     0x29 => 0x29000000 | (paq.registro as u32) << 16 | paq.valor as u32,
+                    0x35 => 0x35000000,
                     0xFF => {
                         break;
                     }
@@ -81,7 +82,7 @@ fn main() -> io::Result<()> {
                     println!("\nmsg: {:08X}", msg);
                 }
                 picoin.write_all(out.as_bytes()).expect("No salió");
-                thread::sleep(time::Duration::from_millis(100));
+                thread::sleep(time::Duration::from_millis(50));
             }
         }
     });
@@ -126,6 +127,8 @@ fn main() -> io::Result<()> {
     let mut registro_buffer = 0;
     let mut escribiendo_registro = false;
     let mut selected_bit = 16;
+
+    pico_update(writer_tx.clone(), 0, 20);
 
     loop {
         terminal.draw(|f| {
@@ -996,6 +999,8 @@ fn main() -> io::Result<()> {
             CEvent::Tick => {}
         }
 
+        //pico_update(writer_tx.clone());
+
         loop {
             let paq = match reader_rx.try_recv() {
                 Ok(pak) => pak,
@@ -1046,6 +1051,10 @@ fn pico_write(reg: u8, dato: u16, writer_tx: Sender<Paquete>) {
         valor: dato,
     };
     writer_tx.send(paq).expect("Falló fn pico_write");
+    pico_update(writer_tx.clone(), 0, 10);
+    if reg==1 && dato&0x0100 == 0x0100 {
+        pico_update(writer_tx.clone(), 10, 20);
+    };
 }
 
 fn arduino_pin_toggle(valor: bool, pin: u8, writer_tx: Sender<Paquete>) {
@@ -1055,4 +1064,15 @@ fn arduino_pin_toggle(valor: bool, pin: u8, writer_tx: Sender<Paquete>) {
         valor: if valor { 0xFFFF } else { 0x0000 },
     };
     writer_tx.send(paq).expect("Falló fn arduino_pin_toggle");
+}
+
+fn pico_update(writer_tx: Sender<Paquete>, inicio:u8, fin:u8){
+    for i in inicio..fin {
+        let paq = Paquete {
+            comando: 0x3C,
+            registro: i,
+            valor: 0,
+        };
+        writer_tx.send(paq).expect("Falló fn pico_update");
+    }
 }

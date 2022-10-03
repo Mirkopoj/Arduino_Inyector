@@ -13,7 +13,7 @@ void setup() {
  digitalWrite(10, 0x1);
  digitalWrite(8, 0x1);
  digitalWrite(9, 0x1);
- SPI.beginTransaction(SPISettings(100000, 1, 0x04));
+ SPI.beginTransaction(SPISettings(1000000, 1, 0x04));
  SPI.begin();
  Serial.begin(9600);
 }
@@ -36,35 +36,20 @@ void loop() {
     uint8_t instruccion = commando>>24;
     instruccion &= 0x7F;
     if (instruccion == 0x25) {
-     digitalWrite(3,0x1);
      spi_write((commando>>16)&0x0000FFFF);
      spi_write((commando)&0x0000FFFF);
      ret = spi_write(0);
     }
-    /*switch (instruccion) {
-					case 0x29:
-						digitalWrite(3,HIGH);
-						int pin = (commando>>16)&0xFF;
-						int pin_state = (commando&0x0000FFFF)==0x0000FFFF? HIGH:LOW;
-						digitalWrite(pin, pin_state);
-						ret = digitalRead(pin)==HIGH? 0xFFFF : 0x0000;
-						break;
-					case 0x3C:
-						digitalWrite(3,HIGH);
-						spi_write((commando>>16)&0x0000FFFF);
-						ret = spi_write(0);
-						break;
-					case 0x25:
-						digitalWrite(3,HIGH);
-						spi_write((commando>>16)&0x0000FFFF);
-						spi_write((commando)&0x0000FFFF);
-						ret = spi_write(0);
-						break;
-					default:
-						digitalWrite(3,HIGH);
-						break;
-				}*/
-    digitalWrite(2,0x1);
+    if (instruccion == 0x3C) {
+     spi_write((commando>>16)&0x0000FFFF);
+     ret = spi_write(0);
+    }
+    if (instruccion == 0x29) {
+     int pin = (commando>>16)&0xFF;
+     int pin_state = (commando&0x0000FFFF)==0x0000FFFF? 0x1:0x0;
+     digitalWrite(pin, pin_state);
+     ret = digitalRead(pin)==0x1? 0xFFFF : 0x0000;
+    }
     commando &= 0xFFFF0000;
     Serial.println(commando|ret);
    }
