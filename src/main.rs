@@ -806,14 +806,19 @@ fn main() -> io::Result<()> {
                             Some(n) => {
                                 match n {
                                     1 => arduino_pin_toggle(
-                                        señal[n] ^ true,
-                                        n as u8,
+                                        señal[1] ^ true,
+                                        2,
                                         writer_tx.clone(),
                                     ),
                                     0 | 2..=9 | 15 => {}
-                                    _ => arduino_pin_toggle(
+                                    16 | 17 => arduino_pin_toggle(
                                         señal[n - 8] ^ true,
                                         (n - 8) as u8,
+                                        writer_tx.clone(),
+                                    ),
+                                    _ => arduino_pin_toggle(
+                                        señal[n - 8] ^ true,
+                                        (n - 7) as u8,
                                         writer_tx.clone(),
                                     ),
                                 };
@@ -1014,7 +1019,14 @@ fn main() -> io::Result<()> {
             };
             match paq.comando & 0x7F {
                 0x25 | 0x3C => { registros[paq.registro as usize] = paq.valor & 0x7FFF; }
-                0x29 => {señal[paq.registro as usize] = paq.valor == 0xFFFF; }
+                0x29 => {señal[
+                    match paq.registro {
+                        2 => 1,
+                        3..=7 => (paq.registro - 1) as usize,
+                        8 | 9 => (paq.registro) as usize,
+                        _ => 0,
+                    }
+                ] = paq.valor == 0xFFFF; }
                 _ => { }
             }
         }
@@ -1064,6 +1076,7 @@ fn arduino_pin_toggle(valor: bool, pin: u8, writer_tx: Sender<Paquete>) {
         valor: if valor { 0xFFFF } else { 0x0000 },
     };
     writer_tx.send(paq).expect("Falló fn arduino_pin_toggle");
+    pico_update(writer_tx.clone(), 0, 10);
 }
 
 fn pico_update(writer_tx: Sender<Paquete>, inicio:u8, fin:u8){
