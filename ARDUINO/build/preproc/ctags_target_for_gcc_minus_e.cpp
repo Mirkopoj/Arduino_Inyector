@@ -1,11 +1,11 @@
-# 1 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino"
-# 2 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino" 2
-# 10 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino"
+# 1 "/home/mirko/Delta/Arduino_Inyector/ARDUINO/ARDUINO.ino"
+# 2 "/home/mirko/Delta/Arduino_Inyector/ARDUINO/ARDUINO.ino" 2
+# 10 "/home/mirko/Delta/Arduino_Inyector/ARDUINO/ARDUINO.ino"
 bool spi_string_valido(char str[10], uint32_t *commando_ret);
 uint16_t spi_write(uint16_t msgF);
 
 void setup() {
- pinMode(10, 0x1);
+ pinMode(53, 0x1);
  pinMode(2, 0x1);
  pinMode(3, 0x1);
  pinMode(4, 0x1);
@@ -14,7 +14,7 @@ void setup() {
  pinMode(7, 0x1);
  pinMode(8, 0x1);
  pinMode(9, 0x1);
- digitalWrite(10, 0x1);
+ digitalWrite(53, 0x1);
  SPI.beginTransaction(SPISettings(1000000, 1, 0x04));
  SPI.begin();
  Serial.begin(9600);
@@ -87,8 +87,8 @@ uint32_t command_parse(char str[10]){
 
 uint16_t spi_write(uint16_t msg){
  uint16_t ret;
- digitalWrite(10, 0x0);
+ digitalWrite(53, 0x0);
  ret = SPI.transfer16(msg);
- digitalWrite(10, 0x1);
+ digitalWrite(53, 0x1);
  return ret;
 }

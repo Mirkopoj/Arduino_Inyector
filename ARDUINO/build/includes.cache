@@ -7,15 +7,15 @@
   {
     "Sourcefile": null,
     "Include": "",
-    "Includepath": "/home/mirko/.arduino15/packages/arduino/hardware/avr/1.8.5/variants/eightanaloginputs"
+    "Includepath": "/home/mirko/.arduino15/packages/arduino/hardware/avr/1.8.5/variants/mega"
   },
   {
-    "Sourcefile": "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/build/sketch/ARDUINO.ino.cpp",
+    "Sourcefile": "/home/mirko/Delta/Arduino_Inyector/ARDUINO/build/sketch/ARDUINO.ino.cpp",
     "Include": "SPI.h",
     "Includepath": "/home/mirko/.arduino15/packages/arduino/hardware/avr/1.8.5/libraries/SPI/src"
   },
   {
-    "Sourcefile": "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/build/sketch/ARDUINO.ino.cpp",
+    "Sourcefile": "/home/mirko/Delta/Arduino_Inyector/ARDUINO/build/sketch/ARDUINO.ino.cpp",
     "Include": "",
     "Includepath": null
   },

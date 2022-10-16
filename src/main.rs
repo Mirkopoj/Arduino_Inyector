@@ -36,7 +36,7 @@ const PRINTS:bool = false;
 fn main() -> io::Result<()> {
     //Launch picocom
     let mut child = match Command::new("picocom")
-        .arg("/dev/ttyUSB0")
+        .arg("/dev/ttyACM0")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()

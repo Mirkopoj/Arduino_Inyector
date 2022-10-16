@@ -1,26 +1,26 @@
 #include <Arduino.h>
-#line 1 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino"
+#line 1 "/home/mirko/Delta/Arduino_Inyector/ARDUINO/ARDUINO.ino"
 #include <SPI.h>
 
 #define MSG_MAX 10
 
-#define SS 10
-#define MOSI 11
-#define MISO 12
-#define SCK 13
+#define SS 53
+#define MOSI 51
+#define MISO 50
+#define SCK 52
 
 bool spi_string_valido(char str[MSG_MAX], uint32_t *commando_ret);
 uint16_t spi_write(uint16_t msgF);
 
-#line 13 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino"
+#line 13 "/home/mirko/Delta/Arduino_Inyector/ARDUINO/ARDUINO.ino"
 void setup();
-#line 29 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino"
+#line 29 "/home/mirko/Delta/Arduino_Inyector/ARDUINO/ARDUINO.ino"
 void loop();
-#line 85 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino"
+#line 85 "/home/mirko/Delta/Arduino_Inyector/ARDUINO/ARDUINO.ino"
 uint32_t command_parse(char str[10]);
-#line 94 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino"
+#line 94 "/home/mirko/Delta/Arduino_Inyector/ARDUINO/ARDUINO.ino"
 uint16_t spi_write(uint16_t msg);
-#line 13 "/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/ARDUINO.ino"
+#line 13 "/home/mirko/Delta/Arduino_Inyector/ARDUINO/ARDUINO.ino"
 void setup() {
 	pinMode(SS, OUTPUT);
 	pinMode(2, OUTPUT);

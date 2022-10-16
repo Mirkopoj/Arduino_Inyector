@@ -2,10 +2,10 @@
 
 #define MSG_MAX 10
 
-#define SS 10
-#define MOSI 11
-#define MISO 12
-#define SCK 13
+#define SS 53
+#define MOSI 51
+#define MISO 50
+#define SCK 52
 
 bool spi_string_valido(char str[MSG_MAX], uint32_t *commando_ret);
 uint16_t spi_write(uint16_t msgF);
