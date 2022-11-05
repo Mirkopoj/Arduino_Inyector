@@ -1,4 +1,4 @@
-/home/mirko/Delta/Arduino_Inyector/ARDUINO/build/libraries/SPI/SPI.cpp.o: \
+/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/ARDUINO/build/libraries/SPI/SPI.cpp.o: \
  /home/mirko/.arduino15/packages/arduino/hardware/avr/1.8.5/libraries/SPI/src/SPI.cpp \
  /home/mirko/.arduino15/packages/arduino/hardware/avr/1.8.5/libraries/SPI/src/SPI.h \
  /home/mirko/.arduino15/packages/arduino/hardware/avr/1.8.5/cores/arduino/Arduino.h \

@@ -36,7 +36,7 @@ const PRINTS:bool = false;
 fn main() -> io::Result<()> {
     //Launch picocom
     let mut child = match Command::new("picocom")
-        .arg("/dev/ttyACM0")
+        .arg("/dev/ttyACM1")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
@@ -66,7 +66,7 @@ fn main() -> io::Result<()> {
                     0x25 => 0x25000000 | (paq.registro as u32) << 16 | paq.valor as u32,
                     0x3C => 0x3C000000 | (paq.registro as u32) << 16,
                     0x29 => 0x29000000 | (paq.registro as u32) << 16 | paq.valor as u32,
-                    0x35 => 0x35000000,
+                    0x37 => 0x37000000 | (paq.registro as u32) << 16 | paq.valor as u32,
                     0xFF => {
                         break;
                     }
@@ -110,8 +110,9 @@ fn main() -> io::Result<()> {
     });
 
     let mut registros: [u16; 20] = [0; 20];
-    let mut señal: [bool; 10] = [false; 10];
+    let mut señal: [bool; 12] = [false; 12];
     let analogicas: [u16; 8] = [0; 8];
+    let mut external: [u16; 2] = [0; 2];
 
     enable_raw_mode()?;
     let mut stdout = io::stdout();
@@ -123,8 +124,11 @@ fn main() -> io::Result<()> {
     reg_table_state.select(Some(0));
     let mut sig_table_state = TableState::default();
     sig_table_state.select(None);
+    let mut ext_table_state = TableState::default();
+    ext_table_state.select(None);
 
     let mut registro_buffer = 0;
+    let mut ext_buffer = 0;
     let mut escribiendo_registro = false;
     let mut selected_bit = 16;
 
@@ -134,10 +138,15 @@ fn main() -> io::Result<()> {
         terminal.draw(|f| {
             let mut sizesig = f.size();
             let mut sizereg = f.size();
+            let mut sizeext = f.size();
 
             sizereg.width /= 2;
             sizesig.width /= 2;
             sizesig.x = sizereg.width;
+            sizereg.height = (sizereg.height*7)/10;
+            sizesig.height = (sizesig.height*7)/10;
+            sizeext.height = (sizeext.height*3)/10;
+            sizeext.y = sizereg.height;
 
             //TABLA 1 - REGISTROS
 
@@ -146,7 +155,7 @@ fn main() -> io::Result<()> {
                     Cell::from("00").style(Style::default().fg(Color::LightCyan)),
                     Cell::from("STATUS"),
                     Cell::from(
-                        "P  M  0  HR HT HD G4 G3 G2 G1 RP DP OD DC OT OC \n".to_string()
+                        "P  M  HR HT HD G4 G3 G2 G1 RP DP UD OD DC OT OC \n".to_string()
                             + &(format!("{:016b}", registros[0])
                                 .chars()
                                 .enumerate()
@@ -669,6 +678,28 @@ fn main() -> io::Result<()> {
                     Cell::from("RFLHI").style(Style::default().fg(Color::White)),
                     Cell::from("SALIDA").style(Style::default().fg(Color::LightGreen)),
                 ]),
+                Row::new(vec![
+                    Cell::from(format!("[{ }]", señal[10])).style(Style::default().fg(
+                        if señal[10] {
+                            Color::LightGreen
+                        } else {
+                            Color::LightRed
+                        },
+                    )),
+                    Cell::from("EXT POWER ENABLE").style(Style::default().fg(Color::White)),
+                    Cell::from("SALIDA").style(Style::default().fg(Color::LightGreen)),
+                ]),
+                Row::new(vec![
+                    Cell::from(format!("[{ }]", señal[11])).style(Style::default().fg(
+                        if señal[11] {
+                            Color::LightGreen
+                        } else {
+                            Color::LightRed
+                        },
+                    )),
+                    Cell::from("EXT TNR").style(Style::default().fg(Color::White)),
+                    Cell::from("SALIDA").style(Style::default().fg(Color::LightGreen)),
+                ]),
             ])
             .style(Style::default().fg(Color::White))
             .header(
@@ -694,7 +725,45 @@ fn main() -> io::Result<()> {
             // ...and potentially show a symbol in front of the selection.
             .highlight_symbol("");
             f.render_stateful_widget(tablesen, sizesig, &mut sig_table_state);
+
+
+            //TABLA 3 - SEÑALES
+
+            let tableext = Table::new(vec![
+                Row::new(vec![
+                    Cell::from("POWER ENABLE"),
+                    Cell::from(external[0].to_string()),
+                ]),
+                Row::new(vec![
+                    Cell::from("SSPA ACTIVE"),
+                    Cell::from(external[1].to_string()),
+                ]),
+            ])
+            .style(Style::default().fg(Color::White))
+            .header(
+                Row::new(vec!["Nombre", "Tiempo (N * 62,5 nS) (N=0 => APAGADO, N=65535 => ENCENDIDO CONSTANTE)"])
+                    .style(Style::default().fg(Color::LightYellow))
+                    .bottom_margin(1),
+            )
+            .block(
+                Block::default()
+                    .title("-External")
+                    .borders(Borders::ALL)
+                    .border_type(BorderType::Rounded),
+            )
+            .widths(&[
+                Constraint::Length(14),
+                Constraint::Length(70),
+            ])
+            // ...and they can be separated by a fixed spacing.
+            .column_spacing(1)
+            // If you wish to highlight a row in any speci:wfic way when it is selected...
+            .highlight_style(Style::default().add_modifier(Modifier::REVERSED))
+            // ...and potentially show a symbol in front of the selection.
+            .highlight_symbol("");
+            f.render_stateful_widget(tableext, sizeext, &mut ext_table_state);
         })?;
+
 
         match tui_rx.recv().unwrap() {
             CEvent::Input(event) => match event.code {
@@ -712,10 +781,16 @@ fn main() -> io::Result<()> {
                         };
                         match sig_table_state.selected() {
                             Some(n) => {
-                                let ind = if n == 17 { 0 } else { n + 1 };
+                                let ind = if n == 19 { 0 } else { n + 1 };
                                 sig_table_state.select(Some(ind));
                             }
                             None => {}
+                        };
+                        match ext_table_state.selected() {
+                            Some(n) => {
+                                ext_table_state.select(Some((n+1)%2));
+                            },
+                            None => {},
                         };
                     };
                 }
@@ -730,10 +805,16 @@ fn main() -> io::Result<()> {
                         };
                         match sig_table_state.selected() {
                             Some(n) => {
-                                let ind = if n == 0 { 17 } else { n - 1 };
+                                let ind = if n == 0 { 19 } else { n - 1 };
                                 sig_table_state.select(Some(ind));
                             }
                             None => {}
+                        };
+                        match ext_table_state.selected() {
+                            Some(n) => {
+                                ext_table_state.select(Some((n+1)%2));
+                            },
+                            None => {},
                         };
                     };
                 }
@@ -745,8 +826,17 @@ fn main() -> io::Result<()> {
                             }
                             None => {}
                         };
+                        match ext_table_state.selected() {
+                            Some(_) => {
+                                ext_table_state.select(None);
+                            },
+                            None => {},
+                        };
                         match sig_table_state.selected() {
-                            Some(_) => {}
+                            Some(_) => {
+                                ext_table_state.select(Some(0));
+                                sig_table_state.select(None);
+                            }
                             None => {
                                 sig_table_state.select(Some(0));
                             }
@@ -761,17 +851,26 @@ fn main() -> io::Result<()> {
                 }
                 KeyCode::Char('h') | KeyCode::Char('H') | KeyCode::Left => {
                     if !escribiendo_registro {
-                        match reg_table_state.selected() {
-                            Some(_) => {}
-                            None => {
-                                reg_table_state.select(Some(0));
-                            }
+                        match ext_table_state.selected() {
+                            Some(_) => {
+                                ext_table_state.select(None);
+                            },
+                            None => {},
                         };
                         match sig_table_state.selected() {
                             Some(_) => {
                                 sig_table_state.select(None);
                             }
                             None => {}
+                        };
+                        match reg_table_state.selected() {
+                            Some(_) => {
+                                ext_table_state.select(Some(0));
+                                reg_table_state.select(None);
+                            }
+                            None => {
+                                reg_table_state.select(Some(0));
+                            }
                         };
                     } else {
                         if reg_table_state.selected() == Some(1) {
@@ -816,12 +915,25 @@ fn main() -> io::Result<()> {
                                         (n - 8) as u8,
                                         writer_tx.clone(),
                                     ),
+                                    18 | 19 => arduino_pin_toggle(
+                                        señal[n - 8] ^ true,
+                                        (n + 30) as u8,
+                                        writer_tx.clone(),
+                                    ),
                                     _ => arduino_pin_toggle(
                                         señal[n - 8] ^ true,
                                         (n - 7) as u8,
                                         writer_tx.clone(),
                                     ),
                                 };
+                            }
+                            None => {}
+                        };
+                        match ext_table_state.selected() {
+                            Some(n) => {
+                                ext_buffer = external[n];
+                                external[n] = 0;
+                                escribiendo_registro = true;
                             }
                             None => {}
                         };
@@ -844,6 +956,14 @@ fn main() -> io::Result<()> {
                             }
                             None => {}
                         };
+                        match ext_table_state.selected() {
+                            Some(n) => {
+                                escribiendo_registro = false;
+                                pico_ext_write(n as u8, external[n], writer_tx.clone());
+                                external[n] = ext_buffer;
+                            }
+                            None => {}
+                        };
                     };
                 }
                 KeyCode::Esc => {
@@ -858,6 +978,13 @@ fn main() -> io::Result<()> {
                             }
                             None => {}
                         };
+                        match ext_table_state.selected() {
+                            Some(n) => {
+                                escribiendo_registro = false;
+                                external[n] = ext_buffer;
+                            }
+                            None => {}
+                        };
                     };
                 }
                 KeyCode::Backspace => {
@@ -869,6 +996,12 @@ fn main() -> io::Result<()> {
                             None => {}
                         };
                     };
+                    match ext_table_state.selected() {
+                        Some(n) => {
+                            external[n] /= 10;
+                        }
+                        None => {}
+                    };
                 }
                 KeyCode::Char('0') => {
                     if escribiendo_registro {
@@ -876,6 +1009,14 @@ fn main() -> io::Result<()> {
                             Some(n) => {
                                 if registros[n] < 6554 {
                                     registros[n] *= 10;
+                                }
+                            }
+                            None => {}
+                        };
+                        match ext_table_state.selected() {
+                            Some(n) => {
+                                if external[n] < 6554 {
+                                    external[n] *= 10;
                                 }
                             }
                             None => {}
@@ -893,6 +1034,15 @@ fn main() -> io::Result<()> {
                             }
                             None => {}
                         };
+                        match ext_table_state.selected() {
+                            Some(n) => {
+                                if external[n] < 6554 {
+                                    external[n] *= 10;
+                                    external[n] += 1;
+                                }
+                            }
+                            None => {}
+                        };
                     };
                 }
                 KeyCode::Char('2') => {
@@ -902,6 +1052,15 @@ fn main() -> io::Result<()> {
                                 if registros[n] < 6554 {
                                     registros[n] *= 10;
                                     registros[n] += 2;
+                                }
+                            }
+                            None => {}
+                        };
+                        match ext_table_state.selected() {
+                            Some(n) => {
+                                if external[n] < 6554 {
+                                    external[n] *= 10;
+                                    external[n] += 2;
                                 }
                             }
                             None => {}
@@ -919,6 +1078,15 @@ fn main() -> io::Result<()> {
                             }
                             None => {}
                         };
+                        match ext_table_state.selected() {
+                            Some(n) => {
+                                if external[n] < 6554 {
+                                    external[n] *= 10;
+                                    external[n] += 3;
+                                }
+                            }
+                            None => {}
+                        };
                     };
                 }
                 KeyCode::Char('4') => {
@@ -928,6 +1096,15 @@ fn main() -> io::Result<()> {
                                 if registros[n] < 6554 {
                                     registros[n] *= 10;
                                     registros[n] += 4;
+                                }
+                            }
+                            None => {}
+                        };
+                        match ext_table_state.selected() {
+                            Some(n) => {
+                                if external[n] < 6554 {
+                                    external[n] *= 10;
+                                    external[n] += 4;
                                 }
                             }
                             None => {}
@@ -945,6 +1122,15 @@ fn main() -> io::Result<()> {
                             }
                             None => {}
                         };
+                        match ext_table_state.selected() {
+                            Some(n) => {
+                                if external[n] < 6554 {
+                                    external[n] *= 10;
+                                    external[n] += 5;
+                                }
+                            }
+                            None => {}
+                        };
                     };
                 }
                 KeyCode::Char('6') => {
@@ -954,6 +1140,15 @@ fn main() -> io::Result<()> {
                                 if registros[n] < 6553 {
                                     registros[n] *= 10;
                                     registros[n] += 6;
+                                }
+                            }
+                            None => {}
+                        };
+                        match ext_table_state.selected() {
+                            Some(n) => {
+                                if external[n] < 6553 {
+                                    external[n] *= 10;
+                                    external[n] += 6;
                                 }
                             }
                             None => {}
@@ -971,6 +1166,15 @@ fn main() -> io::Result<()> {
                             }
                             None => {}
                         };
+                        match ext_table_state.selected() {
+                            Some(n) => {
+                                if external[n] < 6553 {
+                                    external[n] *= 10;
+                                    external[n] += 7;
+                                }
+                            }
+                            None => {}
+                        };
                     };
                 }
                 KeyCode::Char('8') => {
@@ -984,6 +1188,15 @@ fn main() -> io::Result<()> {
                             }
                             None => {}
                         };
+                        match ext_table_state.selected() {
+                            Some(n) => {
+                                if external[n] < 6553 {
+                                    external[n] *= 10;
+                                    external[n] += 8;
+                                }
+                            }
+                            None => {}
+                        };
                     };
                 }
                 KeyCode::Char('9') => {
@@ -993,6 +1206,15 @@ fn main() -> io::Result<()> {
                                 if registros[n] < 6553 {
                                     registros[n] *= 10;
                                     registros[n] += 9;
+                                }
+                            }
+                            None => {}
+                        };
+                        match ext_table_state.selected() {
+                            Some(n) => {
+                                if external[n] < 6553 {
+                                    external[n] *= 10;
+                                    external[n] += 9;
                                 }
                             }
                             None => {}
@@ -1024,6 +1246,7 @@ fn main() -> io::Result<()> {
                         2 => 1,
                         3..=7 => (paq.registro - 1) as usize,
                         8 | 9 => (paq.registro) as usize,
+                        48 | 49 => (paq.registro - 38) as usize,
                         _ => 0,
                     }
                 ] = paq.valor == 0xFFFF; }
@@ -1067,6 +1290,15 @@ fn pico_write(reg: u8, dato: u16, writer_tx: Sender<Paquete>) {
     if reg==1 && dato&0x0100 == 0x0100 {
         pico_update(writer_tx.clone(), 10, 20);
     };
+}
+
+fn pico_ext_write(reg: u8, dato: u16, writer_tx: Sender<Paquete>) {
+    let paq = Paquete {
+        comando: 0x37,
+        registro: reg,
+        valor: dato,
+    };
+    writer_tx.send(paq).expect("Falló fn pico_write");
 }
 
 fn arduino_pin_toggle(valor: bool, pin: u8, writer_tx: Sender<Paquete>) {
