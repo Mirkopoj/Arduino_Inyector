@@ -46,7 +46,7 @@ digitalWrite(SS, HIGH);
 SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE1));
 SPI.begin();
 Serial.begin(9600);
-
+/*
 cli();//stop interrupts
 
 //set timer1 
@@ -63,7 +63,8 @@ TCNT3  = 0;//initialize counter value to 0
 // enable timer compare interrupt
 TIMSK3 |= (1 << OCIE3A);
 
-	sei();//allow interrupts
+sei();//allow interrupts
+*/
 }
 
 void loop() {
@@ -96,6 +97,10 @@ void loop() {
 					int pin = (commando>>16)&0xFF;
 					int pin_state = (commando&0x0000FFFF)==0x0000FFFF? HIGH:LOW;
 					digitalWrite(pin, pin_state);
+					if(pin == TNR){
+						_delay_us(5);
+						digitalWrite(pin, LOW);
+					}
 					ret = digitalRead(pin)==HIGH? 0xFFFF : 0x0000;
 				}
 				if (instruccion == 0x37) {
@@ -168,7 +173,7 @@ ISR(TIMER1_COMPA_vect){
 
 void lanzo_power_enable(uint16_t timer){
 	if (timer == 0) {
-		digitalWrite(POWERENABLE,LOW);
+		//digitalWrite(POWERENABLE,LOW);
 		return;
 	}
 	if (timer == 0xFFFF) {

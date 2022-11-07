@@ -1,1 +1,0 @@
-/home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/target/release/arduino_frontend: /home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/src/main.rs /home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/src/struct_paquete.rs /home/mirko/MPLABXProjects/SSPA.X/arduino_inyector/arduino_frontend/src/usb.rs

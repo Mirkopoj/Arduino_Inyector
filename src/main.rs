@@ -81,7 +81,7 @@ fn main() -> io::Result<()> {
                     println!("\nout: {}", out);
                     println!("\nmsg: {:08X}", msg);
                 }
-                picoin.write_all(out.as_bytes()).expect("No salió");
+                picoin.write_all(out.as_bytes()).expect(format!("No salió {:08X}", msg&0x7FFFFFFF).as_str());
                 thread::sleep(time::Duration::from_millis(50));
             }
         }
