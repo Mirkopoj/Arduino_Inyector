@@ -7,8 +7,8 @@
 #define MISO 50
 #define SCK 52
 
-#define TNR 49
-#define POWERENABLE 48
+#define TNR 11
+#define POWERENABLE 12
 
 #define RFFWD 22
 #define RFRFL 23
@@ -46,6 +46,7 @@ digitalWrite(SS, HIGH);
 SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE1));
 SPI.begin();
 Serial.begin(9600);
+
 /*
 cli();//stop interrupts
 
@@ -53,15 +54,11 @@ cli();//stop interrupts
 TCCR1A = 0;// set entire TCCR1A register to 0
 TCCR1B = 0;// same for TCCR1B
 TCNT1  = 0;//initialize counter value to 0
+TCCR1B |= (1 << WGM12);
+TCCR1B |= (1 << CS10);
+
 // enable timer compare interrupt
 TIMSK1 |= (1 << OCIE1A);
-
-//set timer3 
-TCCR3A = 0;// set entire TCCR3A register to 0
-TCCR3B = 0;// same for TCCR3B
-TCNT3  = 0;//initialize counter value to 0
-// enable timer compare interrupt
-TIMSK3 |= (1 << OCIE3A);
 
 sei();//allow interrupts
 */
@@ -74,6 +71,9 @@ void loop() {
 	uint32_t commando;
 
 	while (true) {
+		//analogWrite(TNR,25);
+		//analogWrite(TNR,40);
+
 		while (Serial.available() && cant < MSG_MAX) {
 			buffer[cant] = Serial.read();
 			cant++;
@@ -98,7 +98,8 @@ void loop() {
 					int pin_state = (commando&0x0000FFFF)==0x0000FFFF? HIGH:LOW;
 					digitalWrite(pin, pin_state);
 					if(pin == TNR){
-						_delay_us(5);
+						//_delay_us(10);
+						_delay_us(500);
 						digitalWrite(pin, LOW);
 					}
 					ret = digitalRead(pin)==HIGH? 0xFFFF : 0x0000;
@@ -106,8 +107,7 @@ void loop() {
 				if (instruccion == 0x37) {
 					int pin = (commando>>16)&0xFF;
 					int timer = (commando&0x0000FFFF);
-					if (pin) { lanzo_tnr(timer);		 }
-					else { lanzo_power_enable(timer); }
+					analogWrite(pin,timer);
 				}
 				commando &= 0xFFFF0000;
 				Serial.println(commando|ret);

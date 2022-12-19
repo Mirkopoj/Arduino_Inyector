@@ -679,25 +679,25 @@ fn main() -> io::Result<()> {
                     Cell::from("SALIDA").style(Style::default().fg(Color::LightGreen)),
                 ]),
                 Row::new(vec![
-                    Cell::from(format!("[{ }]", señal[10])).style(Style::default().fg(
+                    Cell::from(format!("[{ }]", señal[11])).style(Style::default().fg(
                         if señal[10] {
                             Color::LightGreen
                         } else {
                             Color::LightRed
                         },
                     )),
-                    Cell::from("EXT POWER ENABLE").style(Style::default().fg(Color::White)),
+                    Cell::from("EXT TNR").style(Style::default().fg(Color::White)),
                     Cell::from("SALIDA").style(Style::default().fg(Color::LightGreen)),
                 ]),
                 Row::new(vec![
-                    Cell::from(format!("[{ }]", señal[11])).style(Style::default().fg(
+                    Cell::from(format!("[{ }]", señal[10])).style(Style::default().fg(
                         if señal[11] {
                             Color::LightGreen
                         } else {
                             Color::LightRed
                         },
                     )),
-                    Cell::from("EXT TNR").style(Style::default().fg(Color::White)),
+                    Cell::from("EXT POWER ENABLE").style(Style::default().fg(Color::White)),
                     Cell::from("SALIDA").style(Style::default().fg(Color::LightGreen)),
                 ]),
             ])
@@ -731,11 +731,11 @@ fn main() -> io::Result<()> {
 
             let tableext = Table::new(vec![
                 Row::new(vec![
-                    Cell::from("POWER ENABLE"),
+                    Cell::from("TnR"),
                     Cell::from(external[0].to_string()),
                 ]),
                 Row::new(vec![
-                    Cell::from("SSPA ACTIVE"),
+                    Cell::from("POWER ENABLE"),
                     Cell::from(external[1].to_string()),
                 ]),
             ])
@@ -917,7 +917,8 @@ fn main() -> io::Result<()> {
                                     ),
                                     18 | 19 => arduino_pin_toggle(
                                         señal[n - 8] ^ true,
-                                        (n + 30) as u8,
+                                        //(n + 30) as u8,
+                                        (n - 7) as u8,
                                         writer_tx.clone(),
                                     ),
                                     _ => arduino_pin_toggle(
@@ -961,6 +962,13 @@ fn main() -> io::Result<()> {
                                 escribiendo_registro = false;
                                 pico_ext_write(n as u8, external[n], writer_tx.clone());
                                 external[n] = ext_buffer;
+                            }
+                            None => {}
+                        };
+                    } else {
+                        match reg_table_state.selected() {
+                            Some(n) => {
+                                pico_update(writer_tx.clone(), n as u8, n as u8);
                             }
                             None => {}
                         };
@@ -1226,8 +1234,6 @@ fn main() -> io::Result<()> {
             CEvent::Tick => {}
         }
 
-        //pico_update(writer_tx.clone());
-
         loop {
             let paq = match reader_rx.try_recv() {
                 Ok(pak) => pak,
@@ -1246,7 +1252,8 @@ fn main() -> io::Result<()> {
                         2 => 1,
                         3..=7 => (paq.registro - 1) as usize,
                         8 | 9 => (paq.registro) as usize,
-                        48 | 49 => (paq.registro - 38) as usize,
+                        //48 | 49 => (paq.registro - 38) as usize,
+                        12 | 11 => (paq.registro - 1) as usize,
                         _ => 0,
                     }
                 ] = paq.valor == 0xFFFF; }
@@ -1295,7 +1302,7 @@ fn pico_write(reg: u8, dato: u16, writer_tx: Sender<Paquete>) {
 fn pico_ext_write(reg: u8, dato: u16, writer_tx: Sender<Paquete>) {
     let paq = Paquete {
         comando: 0x37,
-        registro: reg,
+        registro: reg+11,
         valor: dato,
     };
     writer_tx.send(paq).expect("Falló fn pico_write");
